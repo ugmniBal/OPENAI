@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>REVO 챗봇</title>
+  <style>
+    body {
+      background: #fef6f0;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .chat-container {
+      background-color: #fff;
+      border-radius: 30px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 420px;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #7fbfbf;
+    }
+    #chat-box {
+      background: #f5faff;
+      border-radius: 20px;
+      height: 300px;
+      padding: 15px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+    .message {
+      padding: 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+      max-width: 75%;
+    }
+    .user { background: #ffe1e1; margin-left: auto; text-align: right; }
+    .bot { background: #d3f8e2; margin-right: auto; text-align: left; }
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px;
+      border: none;
+      border-radius: 50%;
+      background: #7fbfbf;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <h1>REVO 챗봇</h1>
+    <div id="chat-box"></div>
+    <div class="input-row">
+      <input type="text" id="user-input" placeholder="무엇이 궁금한가요?">
+      <button onclick="send()">▶</button>
+    </div>
+  </div>
+
+  <script>
+    async function send() {
+      const input = document.getElementById("user-input");
+      const message = input.value.trim();
+      if (!message) return;
+
+      const chatBox = document.getElementById("chat-box");
+      chatBox.innerHTML += `<div class="message user">${message}</div>`;
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+        const data = await response.json();
+        chatBox.innerHTML += `<div class="message bot">${data.reply}</div>`;
+      } catch {
+        chatBox.innerHTML += `<div class="message bot">GPT 응답 오류</div>`;
+      }
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+      input.value = "";
+    }
+  </script>
+</body>
+</html>
